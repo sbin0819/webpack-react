@@ -1,39 +1,20 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-
-const port = process.env.PORT || 5000;
+// webpack.config.js
+const HTMLWeebPackPlugin = require('html-webpack-plugin'); // 아까 설치한 플러그인이죠? html 문서에 자동으로 번들파일을 추가해줍니다.
+const path = require('path');
 
 module.exports = {
-  // 개발환경
-  mode: 'development',
-
-  // 애플리케이션 시작 경로
-  entry: './src/index.js',
-
-  // 번들된 파일 경로
-  output: {
-    filename: 'bundle.[hash].js',
-  },
-
+  entry: './src/index.tsx', // 처음 시작할 파일을 지정해줍니다. 지정하지 않으면 './src/index.js'가 기본 값이기 때문에 적어줘야 해요
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-        },
+        test: /\.tsx?$/, // .tsx 확장자로 끝나는 파일들을
+        use: 'ts-loader', // ts-loader 가 트랜스파일 해줍니다.
+        exclude: /node_modules/, // node_modules 디렉토리에 있는 파일들이 제외하고
       },
-
       {
-        test: /\.html$/,
-        use: [
-          {
-            loader: 'html-loader',
-            options: {
-              minimize: true,
-            },
-          },
-        ],
+        enforce: 'pre',
+        test: /\.js$/,
+        loader: 'source-map-loader',
       },
       {
         test: /\.css$/i,
@@ -41,17 +22,17 @@ module.exports = {
       },
     ],
   },
-
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: 'public/index.html',
-    }),
-  ],
-
-  // 개발 서버 설정
-  devServer: {
-    host: 'localhost',
-    port: port,
-    open: true, // open page when start
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
   },
+  output: {
+    filename: 'bundle.js', // build시 만들어질 파일 번들 파일 이름
+    path: path.resolve(__dirname, 'dist'), // 그리고 경로 입니다.
+  },
+  plugins: [
+    new HTMLWeebPackPlugin({
+      template: './public/index.html',
+      filename: './index.html',
+    }), // './src/index.html' 경로의 html 파일에 번들 파일을 넣어줍니다.
+  ],
 };
